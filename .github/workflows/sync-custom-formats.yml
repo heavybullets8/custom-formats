@@ -1,0 +1,134 @@
+name: Sync Custom Formats from Upstream
+
+on:
+  schedule:
+    - cron: '0 1 * * *'  # Runs at 1:00 AM UTC every day
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      CONFIG_YAML: config.yaml
+      UPSTREAM_METADATA: upstream_repo/metadata.json
+      GROUPS: "radarr sonarr"
+      SUBKEYS: "custom_formats qualities naming quality_profiles custom_format_groups"
+
+    steps:
+      - name: Checkout Your Repository
+        uses: actions/checkout@v4
+
+      - name: Sparse Checkout Upstream Repository
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/TRaSH-Guides/Guides.git upstream_repo
+          git -C upstream_repo sparse-checkout init --no-cone
+
+          groups=($GROUPS)
+          for group in "${groups[@]}"; do
+            paths=$(jq -r ".json_paths.$group[] | .[]" "$UPSTREAM_METADATA")
+            while IFS= read -r path; do
+              echo "$path/*" >> upstream_repo/.git/info/sparse-checkout
+            done <<< "$paths"
+          done
+
+          readarray -t ADDITIONAL_SYNC <<< "$(yq eval '.additional_sync[]' "$CONFIG_YAML")"
+          for file_path in "${ADDITIONAL_SYNC[@]}"; do
+            echo "$file_path" >> upstream_repo/.git/info/sparse-checkout
+          done
+
+          git -C upstream_repo checkout
+
+      - name: Compare and Update Paths
+        run: |
+          set -e
+
+          groups=($GROUPS)
+          subkeys=($SUBKEYS)
+
+          update_config_yaml() {
+            local group=$1
+            local subkey=$2
+            local new_path=$3
+
+            yq eval ".$group.$subkey.path = \"$new_path\"" -i "$CONFIG_YAML"
+          }
+
+          for group in "${groups[@]}"; do
+            for subkey in "${subkeys[@]}"; do
+              my_path=$(yq eval -r ".$group.$subkey.path" "$CONFIG_YAML")
+              upstream_path=$(jq -r ".json_paths.$group.$subkey[0]" "$UPSTREAM_METADATA")
+
+              if [ "$my_path" != "$upstream_path" ]; then
+                echo "Path mismatch for $group.$subkey:"
+                echo "  My path: $my_path"
+                echo "  Upstream path: $upstream_path"
+                mkdir -p "$upstream_path"
+                echo "Moving files from $my_path to $upstream_path..."
+                mv "$my_path"/* "$upstream_path"/ || echo "No files to move from $my_path."
+                rmdir "$my_path"
+                update_config_yaml "$group" "$subkey" "$upstream_path"
+                echo "Moved files and updated config.yaml for $group.$subkey."
+              else
+                echo "Paths for $group.$subkey are the same. No action needed."
+              fi
+
+            done
+          done
+        shell: bash
+
+      - name: Sync Directories and Files from Upstream
+        run: |
+          set -e
+
+          groups=($GROUPS)
+          subkeys=($SUBKEYS)
+
+          for group in "${groups[@]}"; do
+            for subkey in "${subkeys[@]}"; do
+              path=$(yq eval -r ".$group.$subkey.path" "$CONFIG_YAML")
+
+              src="upstream_repo/$path/"
+              dest="$path/"
+
+              EXCLUDE_ARGS=()
+              exclude_files=$(yq eval ".$group.$subkey.exclude[]" "$CONFIG_YAML")
+              if [ -n "$exclude_files" ] && [ "$exclude_files" != "null" ]; then
+                readarray -t exclude_array <<< "$exclude_files"
+                for filename in "${exclude_array[@]}"; do
+                  EXCLUDE_ARGS+=(--exclude="$filename")
+                done
+              fi
+
+              echo "Syncing $src to $dest"
+              rsync -av --delete "${EXCLUDE_ARGS[@]}" "$src" "$dest"
+            done
+          done
+
+          readarray -t ADDITIONAL_SYNC <<< "$(yq eval '.additional_sync[]' "$CONFIG_YAML")"
+
+          for file_path in "${ADDITIONAL_SYNC[@]}"; do
+            dest_dir=$(dirname "$file_path")
+            mkdir -p "$dest_dir"
+
+            echo "Syncing $file_path"
+            rsync -av "upstream_repo/$file_path" "$file_path"
+          done
+        shell: bash
+
+      - name: Remove Upstream Repository
+        run: rm -rf upstream_repo
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+
+      - name: Commit and Push Changes
+        run: |
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "Sync changes from upstream"
+            git push origin master
+          else
+            echo "No changes to commit"
+          fi
