@@ -1,5 +1,5 @@
 {
-  "trash_id": "a2ab25194f463f057a5559c03c84a3df",
+  "trash_id": "68be37323132b35cf333c81a2ac8fc16",
   "trash_scores": {
       "default": 2000
   },
@@ -102,7 +102,7 @@
       "negate": false,
       "required": false,
       "fields": {
-        "value": 7
+        "value": 3
       }
     },
     {
@@ -111,7 +111,7 @@
       "negate": false,
       "required": false,
       "fields": {
-        "value": 8
+        "value": 4
       }
     }
   ]

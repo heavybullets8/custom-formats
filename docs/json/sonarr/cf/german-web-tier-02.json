@@ -1,99 +1,81 @@
 {
-  "trash_id": "54795711b78ea87e56127928c423689b",
+  "trash_id": "f51b96a50b0e6196cb69724b7833d837",
   "trash_scores": {
-      "default": 3000
+      "default": 1900
   },
-  "name": "German Bluray Tier 01",
+  "name": "German Web Tier 02",
   "includeCustomFormatWhenRenaming": false,
   "specifications": [
     {
-      "name": "ZeroTwo",
+      "name": "VECTOR",
       "implementation": "ReleaseGroupSpecification",
       "negate": false,
       "required": false,
       "fields": {
-        "value": "^(ZeroTwo)$"
+        "value": "^(VECTOR)$"
       }
     },
     {
-      "name": "ZeroTwo Aliases",
+      "name": "MULTiPLEX",
       "implementation": "ReleaseGroupSpecification",
       "negate": false,
       "required": false,
       "fields": {
-        "value": "\\b(BUTTERCUP|HARTZ02|XiSS|DOGPACK404|PRiNCESSDiANA|DiVA)\\b"
+        "value": "^(MULTiPLEX)$"
       }
     },
     {
-      "name": "TSCC",
+      "name": "SiXTYNiNE",
       "implementation": "ReleaseGroupSpecification",
       "negate": false,
       "required": false,
       "fields": {
-        "value": "^(TSCC)$"
+        "value": "^(SiXTYNiNE)$"
       }
     },
     {
-      "name": "TvR",
+      "name": "Oergel",
       "implementation": "ReleaseGroupSpecification",
       "negate": false,
       "required": false,
       "fields": {
-        "value": "^(TvR)$"
+        "value": "^(Oergel)$"
       }
     },
     {
-      "name": "NIMA4K",
+      "name": "4SF",
       "implementation": "ReleaseGroupSpecification",
       "negate": false,
       "required": false,
       "fields": {
-        "value": "^(NIMA4K)$"
+        "value": "^(4SF)$"
       }
     },
     {
-      "name": "TVS",
+      "name": "ABJ",
       "implementation": "ReleaseGroupSpecification",
       "negate": false,
       "required": false,
       "fields": {
-        "value": "^(TVS)$"
+        "value": "^(ABJ)$"
       }
     },
     {
-      "name": "PXL",
-      "implementation": "ReleaseGroupSpecification",
-      "negate": false,
-      "required": false,
-      "fields": {
-        "value": "^(PXL)$"
-      }
-    },
-    {
-      "name": "CNY",
-      "implementation": "ReleaseGroupSpecification",
-      "negate": false,
-      "required": false,
-      "fields": {
-        "value": "^(CNY)$"
-      }
-    },
-    {
-      "name": "Bluray",
+      "name": "WebDL",
       "implementation": "SourceSpecification",
       "negate": false,
-      "required": true,
+      "required": false,
       "fields": {
-        "value": 9
+        "value": 3
       }
     },
     {
-      "name": "Not Remux",
-      "implementation": "QualityModifierSpecification",
-      "negate": true,
-      "required": true,
+      "name": "WebRip",
+      "implementation": "SourceSpecification",
+      "negate": false,
+      "required": false,
       "fields": {
-        "value": 5
+        "value": 4
       }
     }
   ]
