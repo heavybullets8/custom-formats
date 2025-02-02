@@ -2,7 +2,7 @@ name: Sync Custom Formats from Upstream
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # Runs at 1:00 AM UTC every day
+    - cron: "0 1 * * *" # Runs at 1:00 AM UTC every day
   workflow_dispatch:
 
 jobs:
@@ -128,7 +128,8 @@ jobs:
           git add .
           if ! git diff --cached --quiet; then
             git commit -m "Sync changes from upstream"
-            git push origin main
+            git push origin master
           else
             echo "No changes to commit"
           fi
+
