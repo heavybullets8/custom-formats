@@ -1,3 +1,13 @@
+## Archival
+The repo is to be archived as it is no longer required due to the upstream changes to **Recyclarr** in this release: 
+
+https://github.com/recyclarr/recyclarr/releases/tag/v7.5.0
+
+Specifically due to the new `resource_providers`, you can see my migration to using this with my custom formats in this commit:
+
+https://github.com/heavybullets8/heavy-ops/commit/247f19b6d4f624a0cbaf4aec10a9377953495da7
+---
+
 # Slimmed Down TRaSH-Guides for Recyclarr
 
 This repository is a **slimmed-down version** of the excellent [TRaSH-Guides](https://github.com/TRaSH-Guides/Guides) repository, specifically tailored for use with **Recyclarr** and my [**Talos Kubernetes cluster**](https://github.com/Heavybullets8/heavy-ops).
